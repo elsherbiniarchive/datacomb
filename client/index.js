@@ -8,6 +8,4 @@
       if (typeof console !== 'undefined')
         console.log("You pressed the button");
     }
-  });
-
-  console.log(dc);
+  }); 
