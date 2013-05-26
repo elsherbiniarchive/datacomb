@@ -2117,12 +2117,10 @@ if (BEEDATA.find().count() === 0) {
 
 	var dataObjects = [];
 
-	var parseDate = d3.date.format().parse("%Y/%m/%d %H:%M");
-
 	for (var i = 0; i<dummyData.length; i++){
 
 		dataObjects[i] = {			
-			"date": parseDate(dummyData[i][0] + " " + dummyData[i][1]),
+			"date": dummyData[i][0] + " " + dummyData[i][1],
 			"weight": dummyData[i][2],
 			"hiveTemp": dummyData[i][3],
 			"ambientTemp": dummyData[i][4],
