@@ -8,14 +8,22 @@
 
 <template name="dashboard">
 	<div class="container">
+
 		<h2>live data stream</h2>
+
 		<div class="row">
-			<div id="tempWeight-chart">
+			<div id="temp-chart">
 				<strong>temperature vs time</strong>
 				<a class="reset" href="javascript:dc.filterAll();dc.redrawAll();" style="display: none;">reset</a>
 				<div class="clearfix"></div>
 			</div>
+			<div id="weight-chart">
+				<strong>weight vs time</strong>
+				<a class="reset" href="javascript:dc.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+				<div class="clearfix"></div>
+			</div>
 		</div>
+
 		<div class="row">
 			<div id="volume-chart">
 			</div>

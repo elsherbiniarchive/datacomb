@@ -1,6 +1,7 @@
 Meteor.subscribe("datastream", function initializeDashboard() {
 
-	var tempWeightChart = dc.compositeChart("#tempWeight-chart");
+	var tempChart = dc.compositeChart("#temp-chart");
+	var weightChart = dc.compositeChart("#weight-chart");
 	var volumeChart = dc.barChart("#volume-chart");
 
 	var data = BEEDATA.find().fetch();
@@ -45,19 +46,19 @@ Meteor.subscribe("datastream", function initializeDashboard() {
 		}
 	);
 
-	tempWeightChart.width(990)
+	tempChart.width(445)
 		.height(180)
 		.transitionDuration(1000)
 		.margins({top:10, right:50, bottom: 25, left: 40})
 		.dimension(dataByTimepoint)
 		.group(timepointGroup)
-		.x(d3.time.scale().domain([new Date(2012,9,23,16,25), new Date(2012,9,31,0,5) ]))
+		.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})))
 		.xUnits(d3.time.minutes)
 		.elasticY(true)
 		.renderHorizontalGridLines(true)
 		.brushOn(false)
 		.compose([
-			dc.lineChart(tempWeightChart).group(timepointGroup)
+			dc.lineChart(tempChart).group(timepointGroup)
 				.valueAccessor(function (d) {
 					return d.value.hiveTemp;
 				})
@@ -72,6 +73,30 @@ Meteor.subscribe("datastream", function initializeDashboard() {
 			])
 		.xAxis();
 
+	weightChart.width(445)
+		.height(180)
+		.transitionDuration(1000)
+		.margins({top:10, right:50, bottom: 25, left: 40})
+		.dimension(dataByTimepoint)
+		.group(timepointGroup)
+		.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})))
+		.xUnits(d3.time.minutes)
+		.elasticY(true)
+		.renderHorizontalGridLines(true)
+		.brushOn(false)
+		.compose([
+			dc.lineChart(weightChart).group(timepointGroup)
+				.valueAccessor(function (d) {
+					return d.value.weight;
+				})
+				.title(function (d) {
+					var value = d.value.weight;
+					if (isNaN(value)) value = 0;
+						return dateFormat(d.key) + "\n" + value;
+				})
+			])
+		.xAxis();
+
 	volumeChart.width(990)
 		.height(40)
 		.margins({top: 0, right: 50, bottom: 20, left: 40})
@@ -79,16 +104,18 @@ Meteor.subscribe("datastream", function initializeDashboard() {
 		.group(timepointGroup)
 		.centerBar(true)
 		.gap(0)
-		.x(d3.time.scale().domain([new Date(2012,9,23,16,25), new Date(2012,9,31,0,5) ]))
+		.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})))
 		.round(d3.time.minute.round)
 		.xUnits(d3.time.minutes)
 		.renderlet(function (chart) {
 			chart.select("g.y").style("display", "none");
-			tempWeightChart.filter(chart.filter());
+			tempChart.filter(chart.filter());
+			weightChart.filter(chart.filter());
 		})
 		.on("filtered", function (chart) {
 			dc.events.trigger(function () {
-				tempWeightChart.focus(chart.filter());
+				tempChart.focus(chart.filter());
+				weightChart.focus(chart.filter());
 			});
 		});
 
