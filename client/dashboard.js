@@ -1,7 +1,7 @@
 Meteor.subscribe("datastream", function initializeDashboard() {
 
 	var tempChart = dc.compositeChart("#temp-chart");
-	var weightChart = dc.compositeChart("#weight-chart");
+	var weightChart = dc.lineChart("#weight-chart");
 	var volumeChart = dc.barChart("#volume-chart");
 
 	var data = BEEDATA.find().fetch();
@@ -52,6 +52,9 @@ Meteor.subscribe("datastream", function initializeDashboard() {
 		.margins({top:10, right:50, bottom: 25, left: 40})
 		.dimension(dataByTimepoint)
 		.group(timepointGroup)
+		.valueAccessor(function (d) {
+			return d.value.hiveTemp;
+		})
 		.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})))
 		.xUnits(d3.time.minutes)
 		.elasticY(true)
@@ -62,15 +65,21 @@ Meteor.subscribe("datastream", function initializeDashboard() {
 				.valueAccessor(function (d) {
 					return d.value.hiveTemp;
 				})
-				.stack(timepointGroup, function (d) {
+				.title(function (d) {
+						return dateFormat(d.key) + "\n"
+							+ "hive temp: " + d.value.hiveTemp + "\n"
+							+ "ambient temp: " + d.value.ambientTemp;
+				}),
+			dc.lineChart(tempChart).group(timepointGroup)
+				.valueAccessor(function (d) {
 					return d.value.ambientTemp;
 				})
 				.title(function (d) {
-					var value = d.value.hiveTemp;
-					if (isNaN(value)) value = 0;
-						return dateFormat(d.key) + "\n" + value;
+						return dateFormat(d.key) + "\n"
+							+ "hive temp: " + d.value.hiveTemp + " \xB0C\n"
+							+ "ambient temp: " + d.value.ambientTemp + " \xB0C";
 				})
-			])
+		])
 		.xAxis();
 
 	weightChart.width(445)
@@ -84,17 +93,13 @@ Meteor.subscribe("datastream", function initializeDashboard() {
 		.elasticY(true)
 		.renderHorizontalGridLines(true)
 		.brushOn(false)
-		.compose([
-			dc.lineChart(weightChart).group(timepointGroup)
-				.valueAccessor(function (d) {
-					return d.value.weight;
-				})
-				.title(function (d) {
-					var value = d.value.weight;
-					if (isNaN(value)) value = 0;
-						return dateFormat(d.key) + "\n" + value;
-				})
-			])
+		.valueAccessor(function (d) {
+				return d.value.weight;
+			})
+		.title(function (d) {
+				return dateFormat(d.key) + "\n"
+					+ "weight: " + d.value.weight +" lbs";
+		})
 		.xAxis();
 
 	volumeChart.width(990)
