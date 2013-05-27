@@ -1,9 +1,11 @@
-var tempWeightChart = dc.compositeChart("#tempWeight-chart");
+Meteor.subscribe("datastream", function initializeDashboard() {
 
-Meteor.subscribe("datastream", function(){
+	var tempWeightChart = dc.compositeChart("#tempWeight-chart");
+	var volumeChart = dc.barChart("#volume-chart");
+
 	var data = BEEDATA.find().fetch();
-
-	var parseDate = d3.time.format("%Y/%m/%d %H:%M").parse;
+	var dateFormat = d3.time.format("%Y/%m/%d %H:%M")
+	var parseDate = dateFormat.parse;
 
 	data.forEach(function(d){
 		d.date = parseDate(d.date);
@@ -23,7 +25,7 @@ Meteor.subscribe("datastream", function(){
 	var timepointGroup = dataByTimepoint.group().reduce(
 		//add
 		function (p,v){
-			++p.count;
+			p.count += 1;
 			p.weight += +v.weight;
 			p.hiveTemp += +v.hiveTemp;
 			p.ambientTemp += +v.ambientTemp;
@@ -31,7 +33,7 @@ Meteor.subscribe("datastream", function(){
 		},
 		//remove
 		function (p,v){
-			--p.count;
+			p.count -= 1;
 			p.weight -= +v.weight;
 			p.hiveTemp -= +v.hiveTemp;
 			p.ambientTemp -= +v.ambientTemp;
@@ -49,7 +51,7 @@ Meteor.subscribe("datastream", function(){
 		.margins({top:10, right:50, bottom: 25, left: 40})
 		.dimension(dataByTimepoint)
 		.group(timepointGroup)
-		.x(d3.time.scale().domain([new Date(2012,10,23,16,25), new Date(2012,10,31,0,5) ]))
+		.x(d3.time.scale().domain([new Date(2012,9,23,16,25), new Date(2012,9,31,0,5) ]))
 		.xUnits(d3.time.minutes)
 		.elasticY(true)
 		.renderHorizontalGridLines(true)
@@ -57,12 +59,39 @@ Meteor.subscribe("datastream", function(){
 		.compose([
 			dc.lineChart(tempWeightChart).group(timepointGroup)
 				.valueAccessor(function (d) {
-					return d.value.weight;
+					return d.value.hiveTemp;
+				})
+				.stack(timepointGroup, function (d) {
+					return d.value.ambientTemp;
+				})
+				.title(function (d) {
+					var value = d.value.hiveTemp;
+					if (isNaN(value)) value = 0;
+						return dateFormat(d.key) + "\n" + value;
 				})
 			])
 		.xAxis();
 
-	console.log(tempWeightChart.x());
+	volumeChart.width(990)
+		.height(40)
+		.margins({top: 0, right: 50, bottom: 20, left: 40})
+		.dimension(dataByTimepoint)
+		.group(timepointGroup)
+		.centerBar(true)
+		.gap(0)
+		.x(d3.time.scale().domain([new Date(2012,9,23,16,25), new Date(2012,9,31,0,5) ]))
+		.round(d3.time.minute.round)
+		.xUnits(d3.time.minutes)
+		.renderlet(function (chart) {
+			chart.select("g.y").style("display", "none");
+			tempWeightChart.filter(chart.filter());
+		})
+		.on("filtered", function (chart) {
+			dc.events.trigger(function () {
+				tempWeightChart.focus(chart.filter());
+			});
+		});
 
 	dc.renderAll();
-	});
+});
+
