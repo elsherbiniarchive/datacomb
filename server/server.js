@@ -61,9 +61,9 @@ Meteor.startup( function () {
 
 		var doc = {
 			"date": nextDateString,
-			"weight": +modelDoc.weight + 7.5 + Math.random()*.1,
+			"weight": +modelDoc.weight + 7.5 + Math.random(),
 			"hiveTemp": +modelDoc.hiveTemp + Math.random()*.5,
-			"ambientTemp": +modelDoc.ambientTemp + Math.random()*.5,
+			"ambientTemp": +modelDoc.ambientTemp + Math.random(),
 			"windDirection": modelDoc.windDirection,
 			"windSpeed": +modelDoc.windSpeed,
 			"windGustSpeed": +modelDoc.windGustSpeed,
@@ -80,7 +80,7 @@ Meteor.startup( function () {
 
 
 
-	}, 10000);
+	}, 5000);
 
 
 });
