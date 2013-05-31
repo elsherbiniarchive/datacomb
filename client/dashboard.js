@@ -1,10 +1,8 @@
 Meteor.startup(function() {
 
-	Session.set("isInitialized", false);
+	Meteor.subscribe("datastream")});
 
-	Meteor.subscribe("datastream", function renderDashboard() {
-
-			 	var tempChart = dc.compositeChart("#temp-chart"),
+/*			 	var tempChart = dc.compositeChart("#temp-chart"),
 				weightChart = dc.lineChart("#weight-chart"),
 				volumeChart = dc.barChart("#volume-chart"),
 				data = BEEDATA.find().fetch(),
@@ -77,8 +75,7 @@ Meteor.startup(function() {
 										+ "hive temp: " + d.value.hiveTemp + " \xB0C\n"
 										+ "ambient temp: " + d.value.ambientTemp + " \xB0C";
 							})
-					])
-					.xAxis();
+					]);
 
 				weightChart.width(445)
 					.height(180)
@@ -123,17 +120,20 @@ Meteor.startup(function() {
 					});
 
 				dc.renderAll();
-				Session.set("isInitialized", true);
 
 				Deps.autorun( function(){
 						
 						var numberOfRecords = beeData.size(),					 	
-					 	newData = BEEDATA.find({},{sort:{date: 1}, skip: numberOfRecords}).fetch();
+					 	newData = BEEDATA.find({},{sort: {date: 1}, skip: numberOfRecords}).fetch();
 					 	console.log(newData);
 					 	//redraw all the charts, rendering only the delta
 					 	newData.forEach(function(d){
 					 		d.date = parseDate(d.date);
 					 	});
+					 	var data = data.concat(newData); 
+					 	weightChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
+					 	tempChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
+					 	volumeChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
 
 					 	//adds only new records to the crossfilter object
 					 	beeData.add(newData);
@@ -141,7 +141,7 @@ Meteor.startup(function() {
 				});
 		});
 });
-
+*/
  
 
 
