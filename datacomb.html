@@ -3,14 +3,15 @@
 </head>
 
 <body>
+
+  <h2>live data stream</h2>
+
+  {{> recordCount}}
   {{> dashboard}}
 </body>
 
 <template name="dashboard">
 	<div class="container">
-
-		<h2>live data stream</h2>
-
 		<div class="row">
 			<div id="temp-chart">
 				<strong>temperature vs time</strong>
@@ -32,4 +33,8 @@
 			</p>
 		</div>
 	</div>
+</template>
+
+<template name="recordCount">
+	<h3>{{count}} records in database</h3>
 </template>
