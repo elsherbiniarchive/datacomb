@@ -72,15 +72,13 @@ Meteor.startup( function () {
 			"pressure": +modelDoc.pressure,
 			"pressureTrend": modelDoc.pressureTrend
 
-		}
+		};
 
-		doc.ambientFahrenheit = doc.ambientTemp *(9/5) + 32
+		doc.ambientFahrenheit = doc.ambientTemp *(9/5) + 32;
 		
-		BEEDATA.insert(doc)
+		BEEDATA.insert(doc);
 
-
-
-	}, 5000);
+	}, 10000);
 
 
 });

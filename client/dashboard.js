@@ -1,8 +1,8 @@
 Meteor.startup(function() {
 
-	Meteor.subscribe("datastream")});
+	Meteor.subscribe("datastream", function() {
 
-/*			 	var tempChart = dc.compositeChart("#temp-chart"),
+			 	var tempChart = dc.compositeChart("#temp-chart"),
 				weightChart = dc.lineChart("#weight-chart"),
 				volumeChart = dc.barChart("#volume-chart"),
 				data = BEEDATA.find().fetch(),
@@ -53,7 +53,7 @@ Meteor.startup(function() {
 					})
 					.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})))
 					.xUnits(d3.time.minutes)
-					.elasticY(true)
+					.elasticY(false)
 					.renderHorizontalGridLines(true)
 					.brushOn(false)
 					.compose([
@@ -61,6 +61,7 @@ Meteor.startup(function() {
 							.valueAccessor(function (d) {
 								return d.value.hiveTemp;
 							})
+							.brushOn(false)
 							.title(function (d) {
 									return dateFormat(d.key) + "\n"
 										+ "hive temp: " + d.value.hiveTemp + "\n"
@@ -70,6 +71,7 @@ Meteor.startup(function() {
 							.valueAccessor(function (d) {
 								return d.value.ambientTemp;
 							})
+							.brushOn(false)
 							.title(function (d) {
 									return dateFormat(d.key) + "\n"
 										+ "hive temp: " + d.value.hiveTemp + " \xB0C\n"
@@ -118,30 +120,33 @@ Meteor.startup(function() {
 							weightChart.focus(chart.filter());
 						});
 					});
+					window.beeData = beeData;
 
 				dc.renderAll();
+				var isInitialised = true;
 
-				Deps.autorun( function(){
-						
-						var numberOfRecords = beeData.size(),					 	
-					 	newData = BEEDATA.find({},{sort: {date: 1}, skip: numberOfRecords}).fetch();
-					 	console.log(newData);
-					 	//redraw all the charts, rendering only the delta
-					 	newData.forEach(function(d){
-					 		d.date = parseDate(d.date);
-					 	});
-					 	var data = data.concat(newData); 
-					 	weightChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
-					 	tempChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
-					 	volumeChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
+/*				(function(){Deps.autorun( function(){
+						if (isInitialised){
+							var numberOfRecords = beeData.size(),					 	
+						 	newData = BEEDATA.find({},{sort: {date: 1}, skip: numberOfRecords}).fetch();
+						 	console.log(newData);
+						 	//redraw all the charts, rendering only the delta
+						 	newData.forEach(function(d){
+						 		d.date = parseDate(d.date);
+						 	});
+						 	data = data.concat(newData); 
+						 	weightChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
+						 	tempChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
+						 	volumeChart.x(d3.time.scale().domain(d3.extent(data, function(d) {return d.date;})));
+						 	//adds only new records to the crossfilter object
+						 	beeData.add(newData);
+						 	dc.redrawAll();
+					 }
+				})}());*/
+	});
 
-					 	//adds only new records to the crossfilter object
-					 	beeData.add(newData);
-					 	dc.redrawAll();
-				});
-		});
 });
-*/
+
  
 
 
